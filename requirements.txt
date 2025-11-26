@@ -1,0 +1,19 @@
+# MyYear.AI - Personalized Viewing Wrapped Agent
+# Requirements for local development and cloud deployment
+
+# Google Agent Development Kit
+google-adk>=0.1.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# For future API deployment
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+
