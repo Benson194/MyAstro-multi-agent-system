@@ -43,7 +43,25 @@ def read_viewing_history(file_path: str) -> Dict[str, Any]:
             "total_hours": round(total_hours, 2),
             "unique_shows": unique_shows,
             "sample_data": df.head(10).to_dict('records'),
-            "raw_data": df.to_dict('records')  # Full data for analysis
+            "raw_data": None,
+            "summary_stats": {
+                "by_genre": (
+                    {k: float(v) for k, v in df.groupby('genre')['duration_minutes'].sum().items()}
+                    if 'genre' in df.columns else {}
+                ),
+                "by_show_duration": (
+                    {k: float(v) for k, v in df.groupby('show_name')['duration_minutes'].sum().head(20).items()}
+                    if 'show_name' in df.columns else {}
+                ),
+                "top_shows_by_count": (
+                    {k: int(v) for k, v in df['show_name'].value_counts().head(10).items()}
+                    if 'show_name' in df.columns else {}
+                ),
+                "by_month": (
+                    {str(k): float(v) for k, v in df.groupby(df['date'].dt.to_period('M'))['duration_minutes'].sum().items()}
+                    if 'date' in df.columns else {}
+                )
+            }
         }
     except Exception as e:
         return {

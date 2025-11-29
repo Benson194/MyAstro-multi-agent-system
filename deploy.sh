@@ -7,10 +7,16 @@ set -e
 echo "🚀 Deploying MyYear.AI to Google Cloud Run"
 echo "=========================================="
 
+# Load environment variables from .env file
+if [ -f .env ]; then
+    echo "📄 Loading environment variables from .env..."
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
 # Check for required environment variables
 if [ -z "$GCP_PROJECT_ID" ]; then
     echo "❌ Error: GCP_PROJECT_ID not set"
-    echo "Please set: export GCP_PROJECT_ID=your-project-id"
+    echo "Please set it in .env file or run: export GCP_PROJECT_ID=your-project-id"
     exit 1
 fi
 
@@ -60,9 +66,8 @@ gcloud run services describe $SERVICE_NAME --region $REGION --project $PROJECT_I
 echo ""
 echo "📚 API Documentation:"
 echo "  Health: GET /health"
-echo "  Upload: POST /upload"
 echo "  Wrapped: POST /wrapped"
-echo "  Chat: POST /chat"
+echo "  Chat Stream: POST /chat/stream"
 echo ""
 echo "🎉 Deployment successful!"
 

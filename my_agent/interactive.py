@@ -77,7 +77,7 @@ async def interactive_chat(csv_path: str, user_id: str = "user_001"):
         ):
             if event.content and event.content.parts:
                 for part in event.content.parts:
-                    if hasattr(part, 'text') and part.text:
+                    if part.text:
                         print(part.text, end='', flush=True)
         print("\n")
     except Exception as e:
@@ -109,16 +109,22 @@ async def interactive_chat(csv_path: str, user_id: str = "user_001"):
             # Send message to agent (session maintains context)
             print("🤖 Curator: ", end='', flush=True)
             
+            has_response = False
             async for event in runner.run_async(
                 user_id=user_id,
                 session_id=session_id,
                 new_message=types.UserContent(parts=[types.Part(text=user_input)])
             ):
-                # Process all events (streaming and complete)
                 if event.content and event.content.parts:
                     for part in event.content.parts:
-                        if hasattr(part, 'text') and part.text:
+                        if part.text:
                             print(part.text, end='', flush=True)
+                            has_response = True
+            
+            if not has_response:
+                # If no text was printed, the agent might still be processing
+                # Let's wait a moment and check the session
+                print("[Processing...]")
             print("\n")
             
         except KeyboardInterrupt:
@@ -176,7 +182,7 @@ async def quiz_mode(csv_path: str, user_id: str = "user_001"):
         ):
             if event.content and event.content.parts:
                 for part in event.content.parts:
-                    if hasattr(part, 'text') and part.text:
+                    if part.text:
                         print(part.text, end='', flush=True)
         print("\n")
         
@@ -204,7 +210,7 @@ async def quiz_mode(csv_path: str, user_id: str = "user_001"):
             ):
                 if event.content and event.content.parts:
                     for part in event.content.parts:
-                        if hasattr(part, 'text') and part.text:
+                        if part.text:
                             print(part.text, end='', flush=True)
             print("\n")
             

@@ -37,9 +37,6 @@ Astro users watch hundreds of hours of content through MyAstro each year but hav
 - Get personalized recommendations based on viewing behavior
 
 **Current Pain Points for Astro Users:**
-- MyAstro app only shows "Continue Watching" lists
-- No personality insights or viewing pattern analysis
-- Watch history data exists but isn't meaningful or actionable
 - Generic recommendations don't leverage full viewing history
 - No interactive way to explore and understand viewing habits
 - Users can't easily query their watch history ("What did I watch last Tuesday?")
@@ -102,8 +99,8 @@ This project showcases **6 key ADK concepts**:
 - Session-based user experiences
 
 ### 4. ✅ Built-in Tools
-- Gemini 2.5 Flash for fast responses
-- Gemini 2.5 Pro for creative storytelling
+- Gemini 2.5 Flash-Lite for fast responses (all agents except storyteller)
+- Gemini 2.5 Pro for creative storytelling (storyteller agent)
 - Structured output generation
 
 ### 5. ✅ Agent Deployment
@@ -252,6 +249,10 @@ This creates `data/my_viewing_history.csv` with 500 realistic Astro viewing reco
 
 ## 📖 Usage
 
+### 0. API Mode (Recommended for Production)
+
+See [API Usage](#-api-usage) section below for REST API endpoints.
+
 ### 1. Generate Astro Wrapped Experience
 
 ```bash
@@ -310,6 +311,81 @@ watched 4 episodes that night! That was the start of your
 thriller obsession. From that day on, 60% of your viewing 
 became mystery/thriller content! 🔍
 ```
+
+---
+
+## 🌐 API Usage
+
+### Running the API Server
+
+```bash
+# Start the FastAPI server locally
+python -m my_agent.api
+
+# Or with uvicorn
+uvicorn my_agent.api:app --reload --port 8080
+```
+
+### Available Endpoints
+
+#### Health Check
+```bash
+curl http://localhost:8080/health
+```
+
+#### Generate Wrapped
+```bash
+curl -X POST http://localhost:8080/wrapped \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "user123"}'
+```
+
+#### Streaming Chat
+```bash
+curl -X POST http://localhost:8080/chat/stream \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "What was my most watched show?",
+    "user_id": "user123"
+  }' \
+  --no-buffer
+```
+
+**Note:** The API automatically uses `data/my_viewing_history.csv` - no file upload required.
+
+### API Documentation
+
+When the server is running, visit:
+- Swagger UI: `http://localhost:8080/docs`
+- ReDoc: `http://localhost:8080/redoc`
+
+---
+
+## ☁️ Deployment
+
+### Deploy to Google Cloud Run
+
+```bash
+# Set environment variables
+export GCP_PROJECT_ID=your-project-id
+export GOOGLE_API_KEY=your-api-key
+export GCP_REGION=asia-southeast1  # Malaysia region
+
+# Run deployment script
+chmod +x deploy.sh
+./deploy.sh
+```
+
+**What happens:**
+1. Builds Docker container with agent
+2. Pushes to Google Container Registry
+3. Deploys to Cloud Run (Asia Southeast region for Malaysia)
+4. Sets environment variables
+5. Returns public URL for MyAstro integration
+
+The CSV file (`data/my_viewing_history.csv`) is automatically included in the Docker image.
+
+---
 
 ## 📁 Project Structure
 
